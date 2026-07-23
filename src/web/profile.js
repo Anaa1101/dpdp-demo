@@ -8,10 +8,11 @@ function saveSession(user) {
 
   // DPDP-028: PII sent to a third-party analytics SDK
   mixpanel.identify(user.email);
-  analytics.track("login", { email: user.email, phone: user.phone });
-}
-
-// DPDP-024: user input rendered as raw HTML (XSS / data exposure)
-function renderProfile(req) {
-  document.getElementById("bio").innerHTML = req.query.name;
-}
+11 |   analytics.track("login", { email: user.email, phone: user.phone });
+      12 | }
+      13 | 
+      14 | // DPDP-024: user input rendered as raw HTML (XSS / data exposure)
+      15 | function renderProfile(req) {
+>>>   16 |   document.getElementById("bio").textContent = req.query.name;
+      17 | }
+      18 |
