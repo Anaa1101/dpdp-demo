@@ -53,17 +53,19 @@ def encrypt_data(data):
     cipher_suite = Fernet(key)
     cipher_text = cipher_suite.encrypt(data.encode())
     return cipher_text
-
-    # DPDP-028: personal data sent to a third-party analytics SDK
-    mp.track(email, "signup", {"phone": phone, "pan": pan_number})
-
-    # DPDP-027: personal data used as a cache key with no expiry
-    cache.set("user_email_" + email, phone)
-
-    # DPDP-010: raw SQL with plaintext password, string concatenation
-    conn = sqlite3.connect("users.db")
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO users VALUES ('" + email + "', '" + password + "')")
+28 | 
+      29 |     # DPDP-028: personal data sent to a third-party analytics SDK
+      30 |     mp.track(email, "signup", {"phone": phone, "pan": pan_number})
+      31 | 
+      32 |     # DPDP-027: personal data used as a cache key with no expiry
+      33 |     import hashlib
+      34 |     cache_key = "user_email_" + hashlib.sha256(email.encode()).hexdigest()
+      35 |     cache.set(cache_key, phone)
+      36 | 
+      37 |     # DPDP-010: raw SQL with plaintext password, string concatenation
+      38 |     conn = sqlite3.connect("users.db")
+      39 |     cursor = conn.cursor()
+      40 |     cursor.execute("INSERT INTO users VALUES ('" + email + "', '" + password + "')")
     conn.commit()
 
     user = cursor.execute("SELECT * FROM users WHERE email = '" + email + "'").fetchone()
